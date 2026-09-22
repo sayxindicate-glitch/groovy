@@ -2,149 +2,140 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UT Bot Pro Panel Kontrol</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UT Bot Pro - Remote Control</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styling untuk Toggle Switch */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #68D391;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #68D391;
-        }
-        .toggle-checkbox {
-            right: 0;
-            z-index: 1;
-            border-color: #e2e8f0;
-            transition: all 0.3s;
-        }
-        .toggle-label {
-            width: 3rem;
-            height: 1.5rem;
-            background-color: #cbd5e0;
-            border-radius: 9999px;
-            transition: all 0.3s;
-        }
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
+        .toggle-checkbox { right: 0; z-index: 1; border-color: #e2e8f0; transition: all 0.3s; }
+        .toggle-label { width: 3rem; height: 1.5rem; background-color: #cbd5e0; border-radius: 9999px; transition: all 0.3s; }
+        
+        /* Menghilangkan scrollbar default agar terlihat lebih bersih di HP, namun tetap bisa di-scroll */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans">
+<body class="bg-gray-100 font-sans text-gray-800 antialiased">
 
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-3xl font-bold">UT Bot Pro V7</h1>
-            <p class="text-sm mt-2 opacity-80">Remote Control Panel via Cloudflare Worker</p>
-        </div>
-
-        <form id="settingsForm" class="p-6 md:p-8">
-            
-            <!-- MASTER SWITCH (ON/OFF BOT) -->
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md mb-8 flex justify-between items-center shadow-sm">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-800">Status Bot (Master Switch)</h2>
-                    <p class="text-sm text-gray-600">Matikan sakelar ini untuk menghentikan bot membuka open posisi baru.</p>
-                </div>
+    <!-- PANEL ATAS MELAYANG (FLOATING MASTER SWITCH) -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <div>
+                <h2 class="text-base font-bold text-gray-800 leading-tight">Status Bot (Switch)</h2>
+                <p class="text-xs text-gray-500">Hentikan bot buka posisi baru</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="font-bold text-sm" id="status_text">AKTIF</div>
                 <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                     <input type="checkbox" name="bot_active" id="bot_active" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
                     <label for="bot_active" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                 </div>
-                <div class="ml-3 font-bold text-gray-700" id="status_text">AKTIF</div>
             </div>
+        </div>
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- AREA KONTEN BISA DI-SCROLL (Diberi padding atas & bawah agar tidak tertutup panel melayang) -->
+    <div class="max-w-4xl mx-auto pt-24 pb-32 px-4 md:px-8">
+        <form id="settingsForm">
+            <div class="bg-white rounded-xl shadow-sm p-5 space-y-8">
                 
                 <!-- SECTION 1: UT BOT SETTINGS -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">UT Bot Settings</h2>
+                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">UT Bot Settings</h2>
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Key Value (Multiplier a)</label>
-                        <input type="number" step="0.1" id="InpKeyValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
+                        <input type="number" step="0.1" id="InpKeyValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-600">ATR Period (c)</label>
-                        <input type="number" id="InpATRPeriod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
+                        <input type="number" id="InpATRPeriod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
                     </div>
                 </div>
 
                 <!-- SECTION 2: RISK & MONEY MANAGEMENT -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Risk Management</h2>
+                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Risk Management</h2>
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Lot Size</label>
-                        <input type="number" step="0.01" id="InpLotSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
+                        <input type="number" step="0.01" id="InpLotSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Target Profit (USD)</label>
-                        <input type="number" step="1" id="InpTargetProfit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Stop Loss (USD)</label>
-                        <input type="number" step="1" id="InpStopLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Target Profit ($)</label>
+                            <input type="number" step="1" id="InpTargetProfit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Stop Loss ($)</label>
+                            <input type="number" step="1" id="InpStopLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                        </div>
                     </div>
                 </div>
 
                 <!-- SECTION 3: SYSTEM & FILTERS -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">System & Filters</h2>
-                    <div class="flex items-center mt-2">
-                        <input type="checkbox" id="InpStealthMode" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label class="ml-2 block text-sm text-gray-700">Stealth Mode (Anti Broker)</label>
+                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">System & Filters</h2>
+                    <div class="flex items-center p-2 bg-gray-50 rounded border">
+                        <input type="checkbox" id="InpStealthMode" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label class="ml-3 block text-sm font-medium text-gray-700">Stealth Mode (Anti Broker)</label>
                     </div>
-                    <div class="flex items-center mt-2">
-                        <input type="checkbox" id="InpUseEMAFilter" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label class="ml-2 block text-sm text-gray-700">Gunakan EMA Trend Filter</label>
+                    <div class="flex items-center p-2 bg-gray-50 rounded border">
+                        <input type="checkbox" id="InpUseEMAFilter" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label class="ml-3 block text-sm font-medium text-gray-700">Gunakan EMA Trend Filter</label>
                     </div>
                     <div class="mt-2">
                         <label class="block text-sm font-medium text-gray-600">Max Entries per Trend</label>
-                        <input type="number" id="InpMaxEntriesPerTrend" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border" required>
+                        <input type="number" id="InpMaxEntriesPerTrend" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
                     </div>
                 </div>
 
                 <!-- SECTION 4: TRAILING STOP -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Trailing Stop (USD)</h2>
-                    <div class="flex items-center mt-2">
-                        <input type="checkbox" id="InpUseTrailing" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label class="ml-2 block text-sm text-gray-700">Aktifkan Trailing Stop</label>
+                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Trailing Stop (USD)</h2>
+                    <div class="flex items-center p-2 bg-gray-50 rounded border">
+                        <input type="checkbox" id="InpUseTrailing" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label class="ml-3 block text-sm font-medium text-gray-700">Aktifkan Trailing Stop</label>
                     </div>
-                    <!-- TS Level 1 & 2 -->
-                    <div class="grid grid-cols-2 gap-4 mt-2">
+                    
+                    <!-- TS Level 1 -->
+                    <div class="grid grid-cols-2 gap-4 mt-2 bg-gray-50 p-3 rounded border">
                         <div>
                             <label class="block text-xs font-medium text-gray-600">TS 1 Aktif ($)</label>
-                            <input type="number" step="0.1" id="InpTS_Act_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-1 border text-sm">
+                            <input type="number" step="0.1" id="InpTS_Act_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600">TS 1 Lock ($)</label>
-                            <input type="number" step="0.1" id="InpTS_Lock_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-1 border text-sm">
+                            <input type="number" step="0.1" id="InpTS_Lock_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
                         </div>
                     </div>
-                    <!-- Anda bisa menambahkan TS level 2-5 dengan format serupa di sini -->
                 </div>
 
             </div>
-
-            <!-- BUTTONS -->
-            <div class="mt-8 pt-6 border-t flex justify-end gap-4">
-                <button type="button" onclick="loadSettings()" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition shadow">
-                    Muat Ulang
-                </button>
-                <button type="submit" id="saveBtn" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition shadow font-bold">
-                    Simpan ke Cloud
-                </button>
-            </div>
-            
-            <div id="statusMessage" class="mt-4 text-center text-sm font-medium hidden p-3 rounded-md"></div>
         </form>
+    </div>
+
+    <!-- PANEL BAWAH MELAYANG (FLOATING ACTION BUTTONS) -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4">
+        
+        <!-- Notifikasi (Muncul di atas tombol jika ada status) -->
+        <div id="statusMessage" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 hidden px-4 py-2 rounded-full text-xs font-bold shadow-lg text-center w-auto whitespace-nowrap transition-all"></div>
+
+        <div class="max-w-4xl mx-auto flex justify-between items-center gap-3">
+            <button type="button" onclick="loadSettings()" class="w-1/3 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition active:scale-95">
+                Muat Ulang
+            </button>
+            <button type="button" id="saveBtn" class="w-2/3 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md active:scale-95">
+                Simpan
+            </button>
+        </div>
     </div>
 
     <script>
         // --- UBAH URL INI NANTI DENGAN URL CLOUDFLARE WORKER ANDA ---
         const WORKER_URL = "https://utbot-api.username-anda.workers.dev"; 
 
-        // Update teks label ON/OFF ketika toggle ditekan
+        // Update teks label ON/OFF
         const botToggle = document.getElementById('bot_active');
         const statusText = document.getElementById('status_text');
         
@@ -160,28 +151,20 @@
             }
         });
 
-        // Fungsi mengambil data saat halaman dibuka
+        // Load Settings
         async function loadSettings() {
-            const btn = document.getElementById('saveBtn');
-            btn.innerText = "Memuat...";
-            
+            showStatus("Memuat data...", "loading");
             try {
-                // Di dunia nyata, aktifkan baris fetch ini:
-                // const response = await fetch(WORKER_URL);
-                // const data = await response.json();
-
-                // Mockup Data Sementara (Sebelum API siap)
+                // Mockup Data (Nanti ganti dengan fetch)
                 const data = {
-                    bot_active: true,
-                    InpKeyValue: 2.0, InpATRPeriod: 1, InpLotSize: 0.01,
+                    bot_active: true, InpKeyValue: 2.0, InpATRPeriod: 1, InpLotSize: 0.01,
                     InpTargetProfit: 100.0, InpStopLoss: 20.0, InpStealthMode: true,
                     InpUseEMAFilter: true, InpMaxEntriesPerTrend: 1, InpUseTrailing: false,
                     InpTS_Act_1: 20.0, InpTS_Lock_1: 10.0
                 };
 
-                // Populate Form
                 document.getElementById('bot_active').checked = data.bot_active;
-                botToggle.dispatchEvent(new Event('change')); // Trigger event update text
+                botToggle.dispatchEvent(new Event('change'));
 
                 document.getElementById('InpKeyValue').value = data.InpKeyValue;
                 document.getElementById('InpATRPeriod').value = data.InpATRPeriod;
@@ -195,20 +178,24 @@
                 document.getElementById('InpTS_Act_1').value = data.InpTS_Act_1;
                 document.getElementById('InpTS_Lock_1').value = data.InpTS_Lock_1;
 
-                showStatus("Pengaturan berhasil dimuat!", "success");
+                showStatus("Dimuat!", "success");
             } catch (error) {
-                showStatus("Gagal memuat dari server.", "error");
-            } finally {
-                btn.innerText = "Simpan ke Cloud";
+                showStatus("Gagal memuat!", "error");
             }
         }
 
-        // Fungsi menyimpan data ke Worker saat tombol Simpan ditekan
-        document.getElementById('settingsForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // Save Settings
+        document.getElementById('saveBtn').addEventListener('click', async function(e) {
             const btn = document.getElementById('saveBtn');
             btn.innerText = "Menyimpan...";
-            btn.disabled = true;
+            
+            // Cek validasi form bawaan HTML
+            const form = document.getElementById('settingsForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                btn.innerText = "Simpan";
+                return;
+            }
 
             const payload = {
                 bot_active: document.getElementById('bot_active').checked,
@@ -226,44 +213,32 @@
             };
 
             try {
-                /* Di dunia nyata, gunakan fetch ini ke Cloudflare Worker POST
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if(!response.ok) throw new Error("Network response was not ok");
-                */
-                
-                console.log("Data terkirim:", payload);
-                
-                // Delay buatan untuk efek animasi
-                await new Promise(r => setTimeout(r, 800)); 
-                showStatus("Pengaturan berhasil disimpan di Cloud!", "success");
+                // Simulasi delay jaringan
+                await new Promise(r => setTimeout(r, 600)); 
+                console.log("Tersimpan:", payload);
+                showStatus("Tersimpan di Cloud!", "success");
             } catch (error) {
-                showStatus("Gagal menyimpan ke server.", "error");
+                showStatus("Gagal menyimpan!", "error");
             } finally {
-                btn.innerText = "Simpan ke Cloud";
-                btn.disabled = false;
+                btn.innerText = "Simpan";
             }
         });
 
-        // Helper untuk memunculkan notifikasi sukses/error
+        // Helper Notifikasi
         function showStatus(text, type) {
             const msgBox = document.getElementById('statusMessage');
             msgBox.innerText = text;
-            msgBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            msgBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500', 'bg-gray-800', 'text-white');
             
-            if(type === 'success') {
-                msgBox.classList.add('bg-green-100', 'text-green-800');
-            } else {
-                msgBox.classList.add('bg-red-100', 'text-red-800');
-            }
+            if(type === 'success') msgBox.classList.add('bg-green-500', 'text-white');
+            else if(type === 'error') msgBox.classList.add('bg-red-500', 'text-white');
+            else msgBox.classList.add('bg-gray-800', 'text-white'); // loading
+            
             msgBox.style.display = 'block';
-            setTimeout(() => { msgBox.style.display = 'none'; }, 4000);
+            setTimeout(() => { msgBox.style.display = 'none'; }, 2500);
         }
 
-        // Otomatis muat saat buka web
+        // Auto Load
         window.onload = loadSettings;
     </script>
 </body>
