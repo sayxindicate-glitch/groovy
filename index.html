@@ -145,7 +145,8 @@
     </div>
 
     <script>
-        const WORKER_URL = "https://utbot-api.username-anda.workers.dev"; // GANTI NANTI
+        // URL Cloudflare Worker Anda sudah dimasukkan
+        const WORKER_URL = "https://expert666.akranetendoi.workers.dev"; 
 
         const botToggle = document.getElementById('bot_active');
         const statusText = document.getElementById('status_text');
@@ -163,23 +164,13 @@
         async function loadSettings() {
             showStatus("Memuat data...", "loading");
             try {
-                // Default value sesuai file .mq5
-                const data = {
-                    bot_active: true, 
-                    InpKeyValue: 2.0, InpATRPeriod: 1, 
-                    InpLotSize: 0.01, InpTargetProfit: 100.0, InpStopLoss: 20.0, 
-                    InpStealthMode: true, InpUseEMAFilter: true, 
-                    InpMaxEntriesPerTrend: 1, InpMagicNumber: 7772026,
-                    InpUseTrailing: false,
-                    InpTS_Act_1: 20.0, InpTS_Lock_1: 10.0,
-                    InpTS_Act_2: 40.0, InpTS_Lock_2: 25.0,
-                    InpTS_Act_3: 60.0, InpTS_Lock_3: 40.0,
-                    InpTS_Act_4: 80.0, InpTS_Lock_4: 60.0,
-                    InpTS_Act_5: 100.0, InpTS_Lock_5: 85.0
-                };
+                // Fetch data dari Cloudflare Worker
+                const response = await fetch(WORKER_URL);
+                if (!response.ok) throw new Error("Gagal mengambil data dari server");
+                const data = await response.json();
 
-                // Apply to HTML
-                document.getElementById('bot_active').checked = data.bot_active;
+                // Load ke Form
+                document.getElementById('bot_active').checked = data.bot_active !== false;
                 botToggle.dispatchEvent(new Event('change'));
 
                 for (const key in data) {
@@ -190,9 +181,10 @@
                         else el.value = data[key];
                     }
                 }
-                showStatus("Dimuat!", "success");
+                showStatus("Data berhasil dimuat!", "success");
             } catch (error) {
-                showStatus("Gagal memuat!", "error");
+                console.error(error);
+                showStatus("Gagal memuat API server!", "error");
             }
         }
 
@@ -203,9 +195,8 @@
             const form = document.getElementById('settingsForm');
             if (!form.checkValidity()) { form.reportValidity(); btn.innerText = "Simpan"; return; }
 
+            // Kumpulkan payload
             const payload = { bot_active: document.getElementById('bot_active').checked };
-            
-            // Gather all inputs
             const inputs = form.querySelectorAll('input');
             inputs.forEach(input => {
                 if(input.id === 'bot_active') return;
@@ -214,11 +205,19 @@
             });
 
             try {
-                await new Promise(r => setTimeout(r, 600)); // Simulasi API
-                console.log("Tersimpan:", payload);
-                showStatus("Tersimpan di Cloud!", "success");
+                // Post data ke Cloudflare Worker
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error("Server menolak request");
+                
+                showStatus("Tersimpan di Cloudflare KV!", "success");
             } catch (error) {
-                showStatus("Gagal menyimpan!", "error");
+                console.error(error);
+                showStatus("Gagal menyimpan ke server!", "error");
             } finally {
                 btn.innerText = "Simpan";
             }
