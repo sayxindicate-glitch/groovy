@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UT Bot Pro - Remote Control</title>
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styling untuk Toggle Switch */
         .toggle-checkbox:checked { right: 0; border-color: #68D391; }
         .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
         .toggle-checkbox { right: 0; z-index: 1; border-color: #e2e8f0; transition: all 0.3s; }
         .toggle-label { width: 3rem; height: 1.5rem; background-color: #cbd5e0; border-radius: 9999px; transition: all 0.3s; }
-        
-        /* Menghilangkan scrollbar default agar terlihat lebih bersih di HP, namun tetap bisa di-scroll */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 antialiased">
 
-    <!-- PANEL ATAS MELAYANG (FLOATING MASTER SWITCH) -->
+    <!-- FLOATING MASTER SWITCH -->
     <div class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div>
@@ -29,84 +25,108 @@
             <div class="flex items-center gap-3">
                 <div class="font-bold text-sm" id="status_text">AKTIF</div>
                 <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in flex-shrink-0">
-                    <input type="checkbox" name="bot_active" id="bot_active" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                    <input type="checkbox" id="bot_active" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
                     <label for="bot_active" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AREA KONTEN BISA DI-SCROLL (Diberi padding atas & bawah agar tidak tertutup panel melayang) -->
+    <!-- MAIN FORM AREA -->
     <div class="max-w-4xl mx-auto pt-24 pb-32 px-4 md:px-8">
         <form id="settingsForm">
             <div class="bg-white rounded-xl shadow-sm p-5 space-y-8">
                 
-                <!-- SECTION 1: UT BOT SETTINGS -->
+                <!-- UT BOT ALERTS SETTINGS -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">UT Bot Settings</h2>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Key Value (Multiplier a)</label>
-                        <input type="number" step="0.1" id="InpKeyValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">ATR Period (c)</label>
-                        <input type="number" id="InpATRPeriod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Key Value (a)</label>
+                            <input type="number" step="0.1" id="InpKeyValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">ATR Period (c)</label>
+                            <input type="number" id="InpATRPeriod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: RISK & MONEY MANAGEMENT -->
+                <!-- RISK MANAGEMENT (MONEY) -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Risk Management</h2>
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Lot Size</label>
-                        <input type="number" step="0.01" id="InpLotSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                        <input type="number" step="0.01" id="InpLotSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-600">Target Profit ($)</label>
-                            <input type="number" step="1" id="InpTargetProfit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                            <input type="number" step="1" id="InpTargetProfit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600">Stop Loss ($)</label>
-                            <input type="number" step="1" id="InpStopLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                            <input type="number" step="1" id="InpStopLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION 3: SYSTEM & FILTERS -->
+                <!-- SYSTEM & FILTERS -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">System & Filters</h2>
                     <div class="flex items-center p-2 bg-gray-50 rounded border">
-                        <input type="checkbox" id="InpStealthMode" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label class="ml-3 block text-sm font-medium text-gray-700">Stealth Mode (Anti Broker)</label>
+                        <input type="checkbox" id="InpStealthMode" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
+                        <label class="ml-3 block text-sm font-medium text-gray-700">Stealth Mode (Virtual SL/TP)</label>
                     </div>
                     <div class="flex items-center p-2 bg-gray-50 rounded border">
-                        <input type="checkbox" id="InpUseEMAFilter" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <input type="checkbox" id="InpUseEMAFilter" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
                         <label class="ml-3 block text-sm font-medium text-gray-700">Gunakan EMA Trend Filter</label>
                     </div>
-                    <div class="mt-2">
-                        <label class="block text-sm font-medium text-gray-600">Max Entries per Trend</label>
-                        <input type="number" id="InpMaxEntriesPerTrend" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 border bg-gray-50" required>
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Max Entries / Trend</label>
+                            <input type="number" id="InpMaxEntriesPerTrend" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Magic Number</label>
+                            <input type="number" id="InpMagicNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 4: TRAILING STOP -->
+                <!-- TRAILING STOP BERTINGKAT -->
                 <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Trailing Stop (USD)</h2>
-                    <div class="flex items-center p-2 bg-gray-50 rounded border">
-                        <input type="checkbox" id="InpUseTrailing" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Trailing Stop Bertingkat ($)</h2>
+                    <div class="flex items-center p-2 bg-gray-50 rounded border mb-4">
+                        <input type="checkbox" id="InpUseTrailing" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
                         <label class="ml-3 block text-sm font-medium text-gray-700">Aktifkan Trailing Stop</label>
                     </div>
                     
-                    <!-- TS Level 1 -->
-                    <div class="grid grid-cols-2 gap-4 mt-2 bg-gray-50 p-3 rounded border">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">TS 1 Aktif ($)</label>
-                            <input type="number" step="0.1" id="InpTS_Act_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                    <div class="space-y-3">
+                        <!-- Level 1 -->
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
+                            <div><label class="block text-xs text-gray-600">Lvl 1 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_1" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                            <div><label class="block text-xs text-gray-600">Lvl 1 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_1" class="mt-1 w-full rounded p-1 border text-sm"></div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">TS 1 Lock ($)</label>
-                            <input type="number" step="0.1" id="InpTS_Lock_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                        <!-- Level 2 -->
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
+                            <div><label class="block text-xs text-gray-600">Lvl 2 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_2" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                            <div><label class="block text-xs text-gray-600">Lvl 2 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_2" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                        </div>
+                        <!-- Level 3 -->
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
+                            <div><label class="block text-xs text-gray-600">Lvl 3 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_3" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                            <div><label class="block text-xs text-gray-600">Lvl 3 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_3" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                        </div>
+                        <!-- Level 4 -->
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
+                            <div><label class="block text-xs text-gray-600">Lvl 4 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_4" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                            <div><label class="block text-xs text-gray-600">Lvl 4 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_4" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                        </div>
+                        <!-- Level 5 -->
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
+                            <div><label class="block text-xs text-gray-600">Lvl 5 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_5" class="mt-1 w-full rounded p-1 border text-sm"></div>
+                            <div><label class="block text-xs text-gray-600">Lvl 5 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_5" class="mt-1 w-full rounded p-1 border text-sm"></div>
                         </div>
                     </div>
                 </div>
@@ -115,106 +135,86 @@
         </form>
     </div>
 
-    <!-- PANEL BAWAH MELAYANG (FLOATING ACTION BUTTONS) -->
+    <!-- FLOATING ACTION BUTTONS -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4">
-        
-        <!-- Notifikasi (Muncul di atas tombol jika ada status) -->
         <div id="statusMessage" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 hidden px-4 py-2 rounded-full text-xs font-bold shadow-lg text-center w-auto whitespace-nowrap transition-all"></div>
-
         <div class="max-w-4xl mx-auto flex justify-between items-center gap-3">
-            <button type="button" onclick="loadSettings()" class="w-1/3 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition active:scale-95">
-                Muat Ulang
-            </button>
-            <button type="button" id="saveBtn" class="w-2/3 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md active:scale-95">
-                Simpan
-            </button>
+            <button type="button" onclick="loadSettings()" class="w-1/3 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition active:scale-95">Muat Ulang</button>
+            <button type="button" id="saveBtn" class="w-2/3 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md active:scale-95">Simpan</button>
         </div>
     </div>
 
     <script>
-        // --- UBAH URL INI NANTI DENGAN URL CLOUDFLARE WORKER ANDA ---
-        const WORKER_URL = "https://utbot-api.username-anda.workers.dev"; 
+        const WORKER_URL = "https://utbot-api.username-anda.workers.dev"; // GANTI NANTI
 
-        // Update teks label ON/OFF
         const botToggle = document.getElementById('bot_active');
         const statusText = document.getElementById('status_text');
         
         botToggle.addEventListener('change', function() {
             if(this.checked) {
                 statusText.innerText = "AKTIF";
-                statusText.classList.remove('text-red-600');
-                statusText.classList.add('text-green-600');
+                statusText.classList.replace('text-red-600', 'text-green-600');
             } else {
                 statusText.innerText = "MATI";
-                statusText.classList.remove('text-green-600');
-                statusText.classList.add('text-red-600');
+                statusText.classList.replace('text-green-600', 'text-red-600');
             }
         });
 
-        // Load Settings
         async function loadSettings() {
             showStatus("Memuat data...", "loading");
             try {
-                // Mockup Data (Nanti ganti dengan fetch)
+                // Default value sesuai file .mq5
                 const data = {
-                    bot_active: true, InpKeyValue: 2.0, InpATRPeriod: 1, InpLotSize: 0.01,
-                    InpTargetProfit: 100.0, InpStopLoss: 20.0, InpStealthMode: true,
-                    InpUseEMAFilter: true, InpMaxEntriesPerTrend: 1, InpUseTrailing: false,
-                    InpTS_Act_1: 20.0, InpTS_Lock_1: 10.0
+                    bot_active: true, 
+                    InpKeyValue: 2.0, InpATRPeriod: 1, 
+                    InpLotSize: 0.01, InpTargetProfit: 100.0, InpStopLoss: 20.0, 
+                    InpStealthMode: true, InpUseEMAFilter: true, 
+                    InpMaxEntriesPerTrend: 1, InpMagicNumber: 7772026,
+                    InpUseTrailing: false,
+                    InpTS_Act_1: 20.0, InpTS_Lock_1: 10.0,
+                    InpTS_Act_2: 40.0, InpTS_Lock_2: 25.0,
+                    InpTS_Act_3: 60.0, InpTS_Lock_3: 40.0,
+                    InpTS_Act_4: 80.0, InpTS_Lock_4: 60.0,
+                    InpTS_Act_5: 100.0, InpTS_Lock_5: 85.0
                 };
 
+                // Apply to HTML
                 document.getElementById('bot_active').checked = data.bot_active;
                 botToggle.dispatchEvent(new Event('change'));
 
-                document.getElementById('InpKeyValue').value = data.InpKeyValue;
-                document.getElementById('InpATRPeriod').value = data.InpATRPeriod;
-                document.getElementById('InpLotSize').value = data.InpLotSize;
-                document.getElementById('InpTargetProfit').value = data.InpTargetProfit;
-                document.getElementById('InpStopLoss').value = data.InpStopLoss;
-                document.getElementById('InpStealthMode').checked = data.InpStealthMode;
-                document.getElementById('InpUseEMAFilter').checked = data.InpUseEMAFilter;
-                document.getElementById('InpMaxEntriesPerTrend').value = data.InpMaxEntriesPerTrend;
-                document.getElementById('InpUseTrailing').checked = data.InpUseTrailing;
-                document.getElementById('InpTS_Act_1').value = data.InpTS_Act_1;
-                document.getElementById('InpTS_Lock_1').value = data.InpTS_Lock_1;
-
+                for (const key in data) {
+                    if(key === 'bot_active') continue;
+                    const el = document.getElementById(key);
+                    if(el) {
+                        if(el.type === 'checkbox') el.checked = data[key];
+                        else el.value = data[key];
+                    }
+                }
                 showStatus("Dimuat!", "success");
             } catch (error) {
                 showStatus("Gagal memuat!", "error");
             }
         }
 
-        // Save Settings
-        document.getElementById('saveBtn').addEventListener('click', async function(e) {
+        document.getElementById('saveBtn').addEventListener('click', async function() {
             const btn = document.getElementById('saveBtn');
             btn.innerText = "Menyimpan...";
             
-            // Cek validasi form bawaan HTML
             const form = document.getElementById('settingsForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                btn.innerText = "Simpan";
-                return;
-            }
+            if (!form.checkValidity()) { form.reportValidity(); btn.innerText = "Simpan"; return; }
 
-            const payload = {
-                bot_active: document.getElementById('bot_active').checked,
-                InpKeyValue: parseFloat(document.getElementById('InpKeyValue').value),
-                InpATRPeriod: parseInt(document.getElementById('InpATRPeriod').value),
-                InpLotSize: parseFloat(document.getElementById('InpLotSize').value),
-                InpTargetProfit: parseFloat(document.getElementById('InpTargetProfit').value),
-                InpStopLoss: parseFloat(document.getElementById('InpStopLoss').value),
-                InpStealthMode: document.getElementById('InpStealthMode').checked,
-                InpUseEMAFilter: document.getElementById('InpUseEMAFilter').checked,
-                InpMaxEntriesPerTrend: parseInt(document.getElementById('InpMaxEntriesPerTrend').value),
-                InpUseTrailing: document.getElementById('InpUseTrailing').checked,
-                InpTS_Act_1: parseFloat(document.getElementById('InpTS_Act_1').value),
-                InpTS_Lock_1: parseFloat(document.getElementById('InpTS_Lock_1').value)
-            };
+            const payload = { bot_active: document.getElementById('bot_active').checked };
+            
+            // Gather all inputs
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                if(input.id === 'bot_active') return;
+                if(input.type === 'checkbox') payload[input.id] = input.checked;
+                else if(input.type === 'number') payload[input.id] = parseFloat(input.value);
+            });
 
             try {
-                // Simulasi delay jaringan
-                await new Promise(r => setTimeout(r, 600)); 
+                await new Promise(r => setTimeout(r, 600)); // Simulasi API
                 console.log("Tersimpan:", payload);
                 showStatus("Tersimpan di Cloud!", "success");
             } catch (error) {
@@ -224,21 +224,19 @@
             }
         });
 
-        // Helper Notifikasi
         function showStatus(text, type) {
             const msgBox = document.getElementById('statusMessage');
             msgBox.innerText = text;
-            msgBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500', 'bg-gray-800', 'text-white');
+            msgBox.className = "absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 rounded-full text-xs font-bold shadow-lg text-center w-auto whitespace-nowrap transition-all text-white ";
             
-            if(type === 'success') msgBox.classList.add('bg-green-500', 'text-white');
-            else if(type === 'error') msgBox.classList.add('bg-red-500', 'text-white');
-            else msgBox.classList.add('bg-gray-800', 'text-white'); // loading
+            if(type === 'success') msgBox.classList.add('bg-green-500');
+            else if(type === 'error') msgBox.classList.add('bg-red-500');
+            else msgBox.classList.add('bg-gray-800');
             
             msgBox.style.display = 'block';
             setTimeout(() => { msgBox.style.display = 'none'; }, 2500);
         }
 
-        // Auto Load
         window.onload = loadSettings;
     </script>
 </body>
