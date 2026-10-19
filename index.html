@@ -2,241 +2,114 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UT Bot Pro - Remote Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT5 Bot Remote Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
-        .toggle-checkbox { right: 0; z-index: 1; border-color: #e2e8f0; transition: all 0.3s; }
-        .toggle-label { width: 3rem; height: 1.5rem; background-color: #cbd5e0; border-radius: 9999px; transition: all 0.3s; }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-    </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 antialiased">
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-    <!-- FLOATING MASTER SWITCH -->
-    <div class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
-        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-400">🤖 Bot Remote Control</h2>
+        
+        <form id="botForm" class="space-y-4">
+            <!-- ON / OFF Switch -->
+            <div class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
+                <label class="font-semibold">Status Bot</label>
+                <select id="status" class="bg-gray-900 text-white font-bold p-2 rounded outline-none border border-gray-600 focus:border-blue-500">
+                    <option value="ON" class="text-green-500">🟢 ON (Trading)</option>
+                    <option value="OFF" class="text-red-500">🔴 OFF (Berhenti)</option>
+                </select>
+            </div>
+
+            <!-- Parameters -->
             <div>
-                <h2 class="text-base font-bold text-gray-800 leading-tight">Status Bot (Switch)</h2>
-                <p class="text-xs text-gray-500">Hentikan bot buka posisi baru</p>
+                <label class="block text-sm text-gray-400">Lot Size (Sekali Entry)</label>
+                <input type="number" step="0.01" id="lotSize" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="font-bold text-sm" id="status_text">AKTIF</div>
-                <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in flex-shrink-0">
-                    <input type="checkbox" id="bot_active" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                    <label for="bot_active" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+            
+            <div>
+                <label class="block text-sm text-gray-400">Jumlah Eksekusi (Layer)</label>
+                <input type="number" id="jumlahEksekusi" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-400">Stop Loss (Poin)</label>
+                    <input type="number" id="stopLoss" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400">Take Profit (Poin)</label>
+                    <input type="number" id="takeProfit" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- MAIN FORM AREA -->
-    <div class="max-w-4xl mx-auto pt-24 pb-32 px-4 md:px-8">
-        <form id="settingsForm">
-            <div class="bg-white rounded-xl shadow-sm p-5 space-y-8">
-                
-                <!-- UT BOT ALERTS SETTINGS -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">UT Bot Settings</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Key Value (a)</label>
-                            <input type="number" step="0.1" id="InpKeyValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">ATR Period (c)</label>
-                            <input type="number" id="InpATRPeriod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RISK MANAGEMENT (MONEY) -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Risk Management</h2>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Lot Size</label>
-                        <input type="number" step="0.01" id="InpLotSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Target Profit ($)</label>
-                            <input type="number" step="1" id="InpTargetProfit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Stop Loss ($)</label>
-                            <input type="number" step="1" id="InpStopLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SYSTEM & FILTERS -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">System & Filters</h2>
-                    <div class="flex items-center p-2 bg-gray-50 rounded border">
-                        <input type="checkbox" id="InpStealthMode" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
-                        <label class="ml-3 block text-sm font-medium text-gray-700">Stealth Mode (Virtual SL/TP)</label>
-                    </div>
-                    <div class="flex items-center p-2 bg-gray-50 rounded border">
-                        <input type="checkbox" id="InpUseEMAFilter" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
-                        <label class="ml-3 block text-sm font-medium text-gray-700">Gunakan EMA Trend Filter</label>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mt-2">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Max Entries / Trend</label>
-                            <input type="number" id="InpMaxEntriesPerTrend" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Magic Number</label>
-                            <input type="number" id="InpMagicNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TRAILING STOP BERTINGKAT -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-blue-600 border-b pb-2">Trailing Stop Bertingkat ($)</h2>
-                    <div class="flex items-center p-2 bg-gray-50 rounded border mb-4">
-                        <input type="checkbox" id="InpUseTrailing" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
-                        <label class="ml-3 block text-sm font-medium text-gray-700">Aktifkan Trailing Stop</label>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <!-- Level 1 -->
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
-                            <div><label class="block text-xs text-gray-600">Lvl 1 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_1" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                            <div><label class="block text-xs text-gray-600">Lvl 1 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_1" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                        </div>
-                        <!-- Level 2 -->
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
-                            <div><label class="block text-xs text-gray-600">Lvl 2 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_2" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                            <div><label class="block text-xs text-gray-600">Lvl 2 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_2" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                        </div>
-                        <!-- Level 3 -->
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
-                            <div><label class="block text-xs text-gray-600">Lvl 3 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_3" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                            <div><label class="block text-xs text-gray-600">Lvl 3 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_3" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                        </div>
-                        <!-- Level 4 -->
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
-                            <div><label class="block text-xs text-gray-600">Lvl 4 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_4" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                            <div><label class="block text-xs text-gray-600">Lvl 4 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_4" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                        </div>
-                        <!-- Level 5 -->
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-2 rounded border">
-                            <div><label class="block text-xs text-gray-600">Lvl 5 Aktif Jika Profit ($)</label><input type="number" step="0.1" id="InpTS_Act_5" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                            <div><label class="block text-xs text-gray-600">Lvl 5 Kunci Profit di ($)</label><input type="number" step="0.1" id="InpTS_Lock_5" class="mt-1 w-full rounded p-1 border text-sm"></div>
-                        </div>
-                    </div>
-                </div>
-
+            <div>
+                <label class="block text-sm text-gray-400">Magic Number</label>
+                <input type="number" id="magicNumber" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
             </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition mt-4">
+                🚀 Update Parameter ke Bot
+            </button>
+            <p id="statusMsg" class="text-center text-sm mt-2 font-semibold"></p>
         </form>
     </div>
 
-    <!-- FLOATING ACTION BUTTONS -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4">
-        <div id="statusMessage" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 hidden px-4 py-2 rounded-full text-xs font-bold shadow-lg text-center w-auto whitespace-nowrap transition-all"></div>
-        <div class="max-w-4xl mx-auto flex justify-between items-center gap-3">
-            <button type="button" onclick="loadSettings()" class="w-1/3 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition active:scale-95">Muat Ulang</button>
-            <button type="button" id="saveBtn" class="w-2/3 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md active:scale-95">Simpan</button>
-        </div>
-    </div>
-
     <script>
-        // URL Cloudflare Worker Anda sudah dimasukkan
-        const WORKER_URL = "https://expert666.akranetendoi.workers.dev"; 
+        const API_URL = "https://expert666.akranetendoi.workers.dev/";
 
-        const botToggle = document.getElementById('bot_active');
-        const statusText = document.getElementById('status_text');
-        
-        botToggle.addEventListener('change', function() {
-            if(this.checked) {
-                statusText.innerText = "AKTIF";
-                statusText.classList.replace('text-red-600', 'text-green-600');
-            } else {
-                statusText.innerText = "MATI";
-                statusText.classList.replace('text-green-600', 'text-red-600');
-            }
-        });
-
-        async function loadSettings() {
-            showStatus("Memuat data...", "loading");
+        // Ambil data saat ini ketika halaman dimuat
+        async function fetchConfig() {
             try {
-                // Fetch data dari Cloudflare Worker
-                const response = await fetch(WORKER_URL);
-                if (!response.ok) throw new Error("Gagal mengambil data dari server");
-                const data = await response.json();
-
-                // Load ke Form
-                document.getElementById('bot_active').checked = data.bot_active !== false;
-                botToggle.dispatchEvent(new Event('change'));
-
-                for (const key in data) {
-                    if(key === 'bot_active') continue;
-                    const el = document.getElementById(key);
-                    if(el) {
-                        if(el.type === 'checkbox') el.checked = data[key];
-                        else el.value = data[key];
-                    }
-                }
-                showStatus("Data berhasil dimuat!", "success");
-            } catch (error) {
-                console.error(error);
-                showStatus("Gagal memuat API server!", "error");
+                let res = await fetch(API_URL);
+                let data = await res.json();
+                document.getElementById('status').value = data.status;
+                document.getElementById('lotSize').value = data.lotSize;
+                document.getElementById('jumlahEksekusi').value = data.jumlahEksekusi;
+                document.getElementById('stopLoss').value = data.stopLoss;
+                document.getElementById('takeProfit').value = data.takeProfit;
+                document.getElementById('magicNumber').value = data.magicNumber;
+            } catch (e) {
+                console.error("Gagal mengambil data", e);
             }
         }
 
-        document.getElementById('saveBtn').addEventListener('click', async function() {
-            const btn = document.getElementById('saveBtn');
-            btn.innerText = "Menyimpan...";
+        // Kirim update saat tombol ditekan
+        document.getElementById('botForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.submitter;
+            const msg = document.getElementById('statusMsg');
             
-            const form = document.getElementById('settingsForm');
-            if (!form.checkValidity()) { form.reportValidity(); btn.innerText = "Simpan"; return; }
-
-            // Kumpulkan payload
-            const payload = { bot_active: document.getElementById('bot_active').checked };
-            const inputs = form.querySelectorAll('input');
-            inputs.forEach(input => {
-                if(input.id === 'bot_active') return;
-                if(input.type === 'checkbox') payload[input.id] = input.checked;
-                else if(input.type === 'number') payload[input.id] = parseFloat(input.value);
-            });
+            btn.innerText = "⏳ Menyimpan...";
+            
+            const payload = {
+                status: document.getElementById('status').value,
+                lotSize: parseFloat(document.getElementById('lotSize').value),
+                jumlahEksekusi: parseInt(document.getElementById('jumlahEksekusi').value),
+                stopLoss: parseInt(document.getElementById('stopLoss').value),
+                takeProfit: parseInt(document.getElementById('takeProfit').value),
+                magicNumber: parseInt(document.getElementById('magicNumber').value)
+            };
 
             try {
-                // Post data ke Cloudflare Worker
-                const response = await fetch(WORKER_URL, {
+                let res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
-                if (!response.ok) throw new Error("Server menolak request");
-                
-                showStatus("Tersimpan di Cloudflare KV!", "success");
-            } catch (error) {
-                console.error(error);
-                showStatus("Gagal menyimpan ke server!", "error");
-            } finally {
-                btn.innerText = "Simpan";
+                let result = await res.json();
+                msg.innerText = result.message;
+                msg.className = "text-center text-sm mt-2 font-semibold text-green-400";
+            } catch (err) {
+                msg.innerText = "Gagal menyimpan!";
+                msg.className = "text-center text-sm mt-2 font-semibold text-red-400";
             }
+            
+            btn.innerText = "🚀 Update Parameter ke Bot";
+            setTimeout(() => msg.innerText = "", 3000);
         });
 
-        function showStatus(text, type) {
-            const msgBox = document.getElementById('statusMessage');
-            msgBox.innerText = text;
-            msgBox.className = "absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 rounded-full text-xs font-bold shadow-lg text-center w-auto whitespace-nowrap transition-all text-white ";
-            
-            if(type === 'success') msgBox.classList.add('bg-green-500');
-            else if(type === 'error') msgBox.classList.add('bg-red-500');
-            else msgBox.classList.add('bg-gray-800');
-            
-            msgBox.style.display = 'block';
-            setTimeout(() => { msgBox.style.display = 'none'; }, 2500);
-        }
-
-        window.onload = loadSettings;
+        fetchConfig();
     </script>
 </body>
 </html>
