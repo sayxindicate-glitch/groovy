@@ -12,7 +12,6 @@
         <h2 class="text-2xl font-bold mb-6 text-center text-blue-400">🤖 Bot Remote Control</h2>
         
         <form id="botForm" class="space-y-4">
-            <!-- ON / OFF Switch -->
             <div class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
                 <label class="font-semibold">Status Bot</label>
                 <select id="status" class="bg-gray-900 text-white font-bold p-2 rounded outline-none border border-gray-600 focus:border-blue-500">
@@ -21,25 +20,26 @@
                 </select>
             </div>
 
-            <!-- Parameters -->
-            <div>
-                <label class="block text-sm text-gray-400">Lot Size (Sekali Entry)</label>
-                <input type="number" step="0.01" id="lotSize" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
-            </div>
-            
-            <div>
-                <label class="block text-sm text-gray-400">Jumlah Eksekusi (Layer)</label>
-                <input type="number" id="jumlahEksekusi" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
-            </div>
-
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm text-gray-400">Stop Loss (Poin)</label>
-                    <input type="number" id="stopLoss" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+                    <label class="block text-sm text-gray-400">Lot per Eksekusi</label>
+                    <input type="number" step="0.01" id="lotSize" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400">Take Profit (Poin)</label>
-                    <input type="number" id="takeProfit" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+                    <label class="block text-sm text-gray-400">Jumlah Eksekusi</label>
+                    <input type="number" id="jumlahEksekusi" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <!-- Diubah Menjadi Dolar ($) -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-400">Stop Loss ($ Total)</label>
+                    <input type="number" step="0.01" id="stopLoss" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400">Take Profit ($ Total)</label>
+                    <input type="number" step="0.01" id="takeProfit" class="w-full mt-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500" required>
                 </div>
             </div>
 
@@ -58,7 +58,6 @@
     <script>
         const API_URL = "https://expert666.akranetendoi.workers.dev/";
 
-        // Ambil data saat ini ketika halaman dimuat
         async function fetchConfig() {
             try {
                 let res = await fetch(API_URL);
@@ -74,29 +73,23 @@
             }
         }
 
-        // Kirim update saat tombol ditekan
         document.getElementById('botForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.submitter;
             const msg = document.getElementById('statusMsg');
-            
             btn.innerText = "⏳ Menyimpan...";
             
             const payload = {
                 status: document.getElementById('status').value,
                 lotSize: parseFloat(document.getElementById('lotSize').value),
                 jumlahEksekusi: parseInt(document.getElementById('jumlahEksekusi').value),
-                stopLoss: parseInt(document.getElementById('stopLoss').value),
-                takeProfit: parseInt(document.getElementById('takeProfit').value),
+                stopLoss: parseFloat(document.getElementById('stopLoss').value),
+                takeProfit: parseFloat(document.getElementById('takeProfit').value),
                 magicNumber: parseInt(document.getElementById('magicNumber').value)
             };
 
             try {
-                let res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 let result = await res.json();
                 msg.innerText = result.message;
                 msg.className = "text-center text-sm mt-2 font-semibold text-green-400";
@@ -104,7 +97,6 @@
                 msg.innerText = "Gagal menyimpan!";
                 msg.className = "text-center text-sm mt-2 font-semibold text-red-400";
             }
-            
             btn.innerText = "🚀 Update Parameter ke Bot";
             setTimeout(() => msg.innerText = "", 3000);
         });
